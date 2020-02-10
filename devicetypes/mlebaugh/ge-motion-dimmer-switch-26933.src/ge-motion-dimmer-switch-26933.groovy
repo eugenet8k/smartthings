@@ -2,7 +2,7 @@
  *  GE Motion Dimmer Switch
  *	Author: Matt lebaugh (@mlebaugh)
  *
- * Based off of the Dimmer Switch under Templates in the IDE 
+ * Based off of the Dimmer Switch under Templates in the IDE
  * Copyright (C) Matt LeBaugh
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -18,9 +18,9 @@
 
 metadata {
 	definition (name: "GE Motion Dimmer Switch 26933", namespace: "mlebaugh", author: "Matt LeBaugh") {
+        capability "Switch"
 		capability "Motion Sensor"
         capability "Actuator"
- 		capability "Switch"
         capability "Switch Level"
 		capability "Polling"
 		capability "Refresh"
@@ -28,7 +28,7 @@ metadata {
 		capability "Health Check"
 		capability "Light"
         capability "Button"
-        
+
 		command "toggleMode"
         command "Occupancy"
         command "Vacancy"
@@ -36,10 +36,10 @@ metadata {
         command "SetDefaultLevel"
         command "LightSenseOn"
 		command "LightSenseOff"
-        
+
         attribute "operatingMode", "enum", ["Manual", "Vacancy", "Occupancy"]
         attribute "defaultLevel", "number"
-        
+
         fingerprint mfr:"0063", prod:"494D", model: "3034", deviceJoinName: "GE Z-Wave Plus Motion Wall Dimmer"
 	}
 
@@ -53,7 +53,7 @@ metadata {
                     "2" : "Vacancy (auto-off)",
                     "3" : "Occupancy (auto-on/off)"
                 ],
-                
+
             )
             //param 1
             input ("timeoutduration","enum", title: "Timeout Duration",
@@ -110,16 +110,16 @@ metadata {
                     "110" : "27 mins",
                 ],
             )
-            
+
             //dimmersettings
-            
+
             //descrip
             input title: "", description: "Z-Wave Dimmer Ramp rate settings\nDefaults: Step Percent: 1, Duration: 3\n", type: "paragraph", element: "paragraph"
             //param 9
             input "stepSize", "number", title: "Z-Wave Size of Steps in Percent", range: "1..99"
        		//param 10
             input "stepDuration", "number", title: "Z-Wave Steps Intervals each 10 ms", range: "1..255"
-            
+
             //descrip
             input title: "", description: "Single tap ramp rate settings", displayDuringSetup: false, type: "paragraph", element: "paragraph"
             //param 18
@@ -131,7 +131,7 @@ metadata {
             )
             //param 17
             input "switchlevel","number", title: "Default Dim level\nDefault 0: Return to last state", range: "0..99"
-            
+
             //descrip
             input title: "", description: "Manual Ramp rate settings for push and hold\nDefaults: Step Percent: 1, Duration: 3", type: "paragraph", element: "paragraph"
             //param 7
@@ -146,8 +146,8 @@ metadata {
                     "1" : "Enable\n The Dimmer will act as a switch.",
                 ]
             )
-            
-                      
+
+
             //association groups
         	input (
             type: "paragraph",
@@ -157,7 +157,7 @@ metadata {
                          "Devices in association group 3 Same as Group 2 for this device\n\n" +
                          "Devices are entered as a comma delimited list of IDs in hexadecimal format."
         	)
-			           
+
         	input (
             	name: "requestedGroup2",
             	title: "Association Group 2 Members (Max of 5):",
@@ -171,7 +171,7 @@ metadata {
             	type: "text",
             	required: false
         	)
-            
+
              //descrip
             input title: "", description: "SetLevel default function (advanced)", type: "paragraph", element: "paragraph"
             input ("setlevelmode","enum", title: "Setlevel command mode",
@@ -213,7 +213,7 @@ metadata {
 				attributeState "level", action:"switch level.setLevel"
 			}
 		}
-        
+
 		standardTile("motion","device.motion", inactiveLabel: false, width: 2, height: 2) {
                 state "inactive",label:'no motion',icon:"st.motion.motion.inactive",backgroundColor:"#ffffff"
                 state "active",label:'motion',icon:"st.motion.motion.active",backgroundColor:"#53a7c0"
@@ -222,7 +222,7 @@ metadata {
 		standardTile("refresh", "device.switch", width: 2, height: 2, inactiveLabel: false, decoration: "flat") {
 			state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
-              
+
 		standardTile("operatingMode", "device.operatingMode", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
 			state "default", label:'Mode toggle: ${currentValue}', unit:"", action:"toggleMode"
 		}
@@ -303,7 +303,7 @@ def zwaveEvent(physicalgraph.zwave.commands.configurationv2.ConfigurationReport 
     def config = cmd.scaledConfigurationValue
     def result = []
     if (cmd.parameterNumber == 1) {
-		def value = config == 0 ? "Test 5s" : config == 1 ? "1 minute" : config == 5 ? "5 minute" : config == 15 ? "15 minute" : config == 30 ? "30 minute" : "disabled" 
+		def value = config == 0 ? "Test 5s" : config == 1 ? "1 minute" : config == 5 ? "5 minute" : config == 15 ? "15 minute" : config == 30 ? "30 minute" : "disabled"
     	result << createEvent([name:"TimeoutDuration", value: value, displayed:true, isStateChange:true])
     } else if (cmd.parameterNumber == 13) {
 		def value = config == 1 ? "High" : config == 2 ? "Medium" : "Low"
@@ -312,7 +312,7 @@ def zwaveEvent(physicalgraph.zwave.commands.configurationv2.ConfigurationReport 
 		def value = config == 0 ? "Disabled" : "Enabled"
     	result << createEvent([name:"LightSense", value: value, displayed:true, isStateChange:true])
     } else if (cmd.parameterNumber == 15) {
-    	def value = config == 0 ? "Disabled" : config == 1 ? "10 sec" : config == 2 ? "20 sec" : config == 3 ? "30 sec" : config == 4 ? "45 sec" : "27 minute" 
+    	def value = config == 0 ? "Disabled" : config == 1 ? "10 sec" : config == 2 ? "20 sec" : config == 3 ? "30 sec" : config == 4 ? "45 sec" : "27 minute"
     	result << createEvent([name:"ResetCycle", value: value, displayed:true, isStateChange:true])
     } else if (cmd.parameterNumber == 3) {
     	if (config == 1 ) {
@@ -328,7 +328,7 @@ def zwaveEvent(physicalgraph.zwave.commands.configurationv2.ConfigurationReport 
     } else if (cmd.parameterNumber == 5) {
     	def value = config == 0 ? "Normal" : "Inverted"
     	result << createEvent([name:"SwitchOrientation", value: value, displayed:true, isStateChange:true])
-    } 
+    }
     //dimmer settings
       else if (cmd.parameterNumber == 7) {
     	result << createEvent([name:"StepSize", value: config, displayed:true, isStateChange:true])
@@ -365,7 +365,7 @@ def zwaveEvent(physicalgraph.zwave.commands.manufacturerspecificv2.ManufacturerS
 	log.debug "productId:        ${cmd.productId}"
 	log.debug "productTypeId:    ${cmd.productTypeId}"
 	def msr = String.format("%04X-%04X-%04X", cmd.manufacturerId, cmd.productTypeId, cmd.productId)
-	updateDataValue("MSR", msr)	
+	updateDataValue("MSR", msr)
     sendEvent([descriptionText: "$device.displayName MSR: $msr", isStateChange: false])
 }
 
@@ -388,13 +388,13 @@ def zwaveEvent(physicalgraph.zwave.commands.notificationv3.NotificationReport cm
 	def result = []
     def cmds = []
 	if (cmd.notificationType == 0x07) {
-		if ((cmd.event == 0x00)) { 
+		if ((cmd.event == 0x00)) {
            	result << createEvent(name: "motion", value: "inactive", descriptionText: "$device.displayName motion has stopped")
          } else if (cmd.event == 0x08) {
-            result << createEvent(name: "motion", value: "active", descriptionText: "$device.displayName detected motion")	  
+            result << createEvent(name: "motion", value: "active", descriptionText: "$device.displayName detected motion")
         }
     }
-	result  
+	result
 }
 
 
@@ -432,7 +432,7 @@ private dimmerEvents(physicalgraph.zwave.Command cmd) {
 
 
 def on() {
-    delayBetween([zwave.basicV1.basicSet(value: 0xFF).format(), zwave.switchMultilevelV3.switchMultilevelGet().format()], 5000) 
+    delayBetween([zwave.basicV1.basicSet(value: 0xFF).format(), zwave.switchMultilevelV3.switchMultilevelGet().format()], 5000)
 }
 
 
@@ -454,8 +454,8 @@ def setLevel(value) {
 	def valueaux = value as Integer
 	def level = Math.min(valueaux, 99)
     def cmds = []
-    	
-    if (settings.setlevelmode == "1"){ 
+
+    if (settings.setlevelmode == "1"){
     	log.debug "setlevel with advanced mode"
     	if (device.currentValue("switch") == "on") {
             sendEvent(name: "level", value: level, unit: "%")
@@ -466,7 +466,7 @@ def setLevel(value) {
         } else if (device.currentValue("switch") == "off") {
             cmds << zwave.configurationV1.configurationSet(configurationValue: [level] , parameterNumber: 17, size: 1)
             cmds << zwave.configurationV1.configurationGet(parameterNumber: 17)
-        }        
+        }
         sendHubCommand(cmds.collect{ new physicalgraph.device.HubAction(it.format()) }, 500)
     } else {
     	log.debug "setlevel with basic mode ${settings.setlevelmode}"
@@ -504,9 +504,9 @@ def refresh() {
 
 
 def toggleMode() {
-	log.debug("Toggling Mode") 
+	log.debug("Toggling Mode")
     def cmds = []
-    if (device.currentValue("operatingMode") == "Manual") { 
+    if (device.currentValue("operatingMode") == "Manual") {
     	cmds << zwave.configurationV1.configurationSet(configurationValue: [2] , parameterNumber: 3, size: 1)
     }
     else if (device.currentValue("operatingMode") == "Vacancy") {
@@ -522,7 +522,7 @@ def toggleMode() {
 
 
 def SetModeNumber(value) {
-	log.debug("Setting mode by number: ${value}") 
+	log.debug("Setting mode by number: ${value}")
     def cmds = []
     	cmds << zwave.configurationV1.configurationSet(configurationValue: [value] , parameterNumber: 3, size: 1)
   		cmds << zwave.configurationV1.configurationGet(parameterNumber: 3)
@@ -557,7 +557,7 @@ def Manual() {
 }
 
 def SetDefaultLevel(value) {
-	log.debug("Setting default level: ${value}") 
+	log.debug("Setting default level: ${value}")
     def cmds = []
     	cmds << zwave.configurationV1.configurationSet(configurationValue: [value] , parameterNumber: 17, size: 1)
   		cmds << zwave.configurationV1.configurationGet(parameterNumber: 17)
@@ -565,14 +565,14 @@ def SetDefaultLevel(value) {
 }
 
 def LightSenseOn() {
-	log.debug("Setting Light Sense On") 
+	log.debug("Setting Light Sense On")
     def cmds = []
     	cmds << zwave.configurationV1.configurationSet(configurationValue: [1], parameterNumber: 14, size: 1)
     sendHubCommand(cmds.collect{ new physicalgraph.device.HubAction(it.format()) }, 1000)
 }
 
 def LightSenseOff() {
-	log.debug("Setting Light Sense Off") 
+	log.debug("Setting Light Sense Off")
     def cmds = []
     	cmds << zwave.configurationV1.configurationSet(configurationValue: [0], parameterNumber: 14, size: 1)
     sendHubCommand(cmds.collect{ new physicalgraph.device.HubAction(it.format()) }, 1000)
@@ -650,11 +650,11 @@ def updated() {
         	state.currentGroup3 = settings.requestedGroup3
     	}
 	// end switch and dimmer settings
-		        
+
     // dimmer specific settings
         //param 7 zwave step
         if (settings.stepSize) {
-        	cmds << zwave.configurationV1.configurationSet(configurationValue: [settings.stepSize.toInteger()], parameterNumber: 7, size: 1)    
+        	cmds << zwave.configurationV1.configurationSet(configurationValue: [settings.stepSize.toInteger()], parameterNumber: 7, size: 1)
         	cmds << zwave.configurationV1.configurationGet(parameterNumber: 7)
         }
         //param 8 zwave duration
@@ -670,7 +670,7 @@ def updated() {
         //param 10 manual duration
         if (settings.manualStepDuration) {
         	cmds << zwave.configurationV1.configurationSet(configurationValue: [0,settings.manualStepDuration.toInteger()], parameterNumber: 10, size: 2)
-        	cmds << zwave.configurationV1.configurationGet(parameterNumber: 10)  
+        	cmds << zwave.configurationV1.configurationGet(parameterNumber: 10)
 		}
         //switch mode param 16
         if (settings.switchmode == 0) {
@@ -690,7 +690,7 @@ def updated() {
         if (settings.dimrate) {cmds << zwave.configurationV1.configurationSet(configurationValue: [settings.dimrate.toInteger()], parameterNumber: 18, size: 1)}
         cmds << zwave.configurationV1.configurationGet(parameterNumber: 18)
 	//end of dimmer specific params
-        
+
     sendHubCommand(cmds.collect{ new physicalgraph.device.HubAction(it.format()) }, 500)
 }
 
@@ -746,6 +746,6 @@ private parseAssocGroupList(list, group) {
             }
         }
     }
-    
+
     return nodes
 }
