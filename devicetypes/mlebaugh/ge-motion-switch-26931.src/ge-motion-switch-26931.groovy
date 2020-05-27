@@ -18,6 +18,7 @@
 metadata {
   definition (name: "GE Motion Switch 26931", namespace: "mlebaugh", author: "Matt LeBaugh") {
     capability "Switch"
+    capability "Switch Level"
     capability "Motion Sensor"
     capability "Actuator"
     capability "Polling"
